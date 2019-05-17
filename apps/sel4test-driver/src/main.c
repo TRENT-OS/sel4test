@@ -476,24 +476,33 @@ int main(void)
     int error;
     seL4_BootInfo *info = platsupport_get_bootinfo();
 
+    printf("sel4test-driver\n");
+
 #ifdef CONFIG_DEBUG_BUILD
     seL4_DebugNameThread(seL4_CapInitThreadTCB, "sel4test-driver");
 #endif
+
+    printf("s00\n");
 
     compile_time_assert(init_data_fits_in_ipc_buffer, sizeof(test_init_data_t) < PAGE_SIZE_4K);
     /* initialise libsel4simple, which abstracts away which kernel version
      * we are running on */
     simple_default_init_bootinfo(&env.simple, info);
 
+    printf("s01\n");
+
     /* initialise the test environment - allocator, cspace manager, vspace
      * manager, timer
      */
     init_env(&env);
 
+    printf("s02\n");
     /* Allocate slots for, and obtain the caps for, the hardware we will be
      * using, in the same function.
      */
     sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
+
+    printf("s03\n");
 
     /* Construct a vka wrapper for returning the serial frame. We need to
      * create this wrapper as the actual vka implementation will only
@@ -506,6 +515,8 @@ int main(void)
     vka_t serial_vka = env.vka;
     serial_vka.utspace_alloc_at = arch_get_serial_utspace_alloc_at(&env);
 
+    printf("s04\n");
+
     /* Construct a simple wrapper for returning the I/O ports. We need this
      * wrapper as we can only allocate I/O ports once and we already allocated
      * them in sel4platsupport_init_default_serial_caps */
@@ -514,11 +525,16 @@ int main(void)
     serial_simple.arch_simple.IOPort_cap = arch_get_serial_ioport_cap(&env);
 #endif
 
+    printf("s05\n");
     /* enable serial driver */
     platsupport_serial_setup_simple(&env.vspace, &serial_simple, &serial_vka);
 
+    printf("s06\n");
+
     /* Initialise ltimer */
     init_timer();
+
+    printf("s07\n");
 
     simple_print(&env.simple);
 
