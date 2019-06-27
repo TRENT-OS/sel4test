@@ -131,8 +131,7 @@ static int test_fpu_multithreaded(struct env *env)
 
     return sel4test_get_result();
 }
-DEFINE_TEST(FPU0001, "Ensure multiple threads can use FPU simultaneously", test_fpu_multithreaded,
-            !config_set(CONFIG_FT))
+DEFINE_TEST(FPU0001, "Ensure multiple threads can use FPU simultaneously", test_fpu_multithreaded, false && !config_set(CONFIG_FT))
 
 static int
 smp_fpu_worker(volatile seL4_Word *ex, volatile seL4_Word *run)
