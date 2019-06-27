@@ -89,7 +89,7 @@ if (NOT Sel4testAllowSettingsOverride)
     # sel4test specific config settings.
 
     # sel4test creates processes from libsel4utils that require relatively large cspaces
-    set(LibSel4UtilsCSpaceSizeBits 17 CACHE STRING "" FORCE)
+    set(LibSel4UtilsCSpaceSizeBits 12 CACHE STRING "" FORCE)
 
     if (SIMULATION)
         set(Sel4testHaveCache OFF CACHE BOOL "" FORCE)

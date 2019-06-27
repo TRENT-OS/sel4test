@@ -22,7 +22,7 @@
 #define PRIORITY_FUDGE 1
 
 #define MIN_PRIO seL4_MinPrio
-#define MAX_PRIO (OUR_PRIO - 1)
+#define MAX_PRIO (10 - 1)
 #define NUM_PRIOS (MAX_PRIO - MIN_PRIO + 1)
 
 #define CHECK_STEP(var, x) do { \
@@ -252,7 +252,7 @@ test_suspend(struct env* env)
 
     return sel4test_get_result();
 }
-DEFINE_TEST(SCHED0003, "Test TCB suspend/resume", test_suspend, !config_set(CONFIG_FT))
+DEFINE_TEST(SCHED0003, "Test TCB suspend/resume", test_suspend, false && !config_set(CONFIG_FT))
 
 /*
  * Test threads at all possible priorities, and that they get scheduled in the

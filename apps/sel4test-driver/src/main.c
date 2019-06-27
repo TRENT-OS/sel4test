@@ -53,7 +53,7 @@
 #include <sel4platsupport/io.h>
 
 /* ammount of untyped memory to reserve for the driver (32mb) */
-#define DRIVER_UNTYPED_MEMORY (1 << 25)
+#define DRIVER_UNTYPED_MEMORY (1 << 21)
 /* Number of untypeds to try and use to allocate the driver memory.
  * if we cannot get 32mb with 16 untypeds then something is probably wrong */
 #define DRIVER_NUM_UNTYPEDS 16
@@ -62,7 +62,7 @@
 #define ALLOCATOR_VIRTUAL_POOL_SIZE ((1 << seL4_PageBits) * 100)
 
 /* static memory for the allocator to bootstrap with */
-#define ALLOCATOR_STATIC_POOL_SIZE ((1 << seL4_PageBits) * 20)
+#define ALLOCATOR_STATIC_POOL_SIZE ((1 << seL4_PageBits) * 12)
 static char allocator_mem_pool[ALLOCATOR_STATIC_POOL_SIZE];
 
 /* static memory for virtual memory bootstrapping */
@@ -303,6 +303,7 @@ static int collate_tests(testcase_t *tests_in, int n, testcase_t *tests_out[], i
                 tests_out[out_index] = &tests_in[i];
                 out_index++;
             } else {
+                printf("%s\n", tests_in[i].name);
                 (*skipped_tests)++;
             }
         }
