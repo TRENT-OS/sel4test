@@ -61,17 +61,22 @@ static int
 call_func(seL4_Word endpoint, seL4_Word seed, seL4_Word reply, seL4_Word extra)
 {
     test_result_t result = SUCCESS;
+    //ZF_LOGE("s10\n");
     FOR_EACH_LENGTH(length) {
+        //ZF_LOGE("s101\n");
         seL4_MessageInfo_t tag = seL4_MessageInfo_new(0, 0, 0, length);
 
+        //ZF_LOGE("s11\n");
         /* Construct a message. */
         for (int i = 0; i < length; i++) {
             seL4_SetMR(i, seed);
             seed++;
         }
 
+        //ZF_LOGE("s12\n");
         tag = seL4_Call(endpoint, tag);
 
+        //ZF_LOGE("s13\n");
         seL4_Word actual_len = length;
         /* Sanity check the received message. */
         if (actual_len <= seL4_MsgMaxLength) {
@@ -82,6 +87,7 @@ call_func(seL4_Word endpoint, seL4_Word seed, seL4_Word reply, seL4_Word extra)
             actual_len = seL4_MsgMaxLength;
         }
 
+        //ZF_LOGE("s14\n");
         for (int i = 0; i < actual_len; i++) {
             seL4_Word mr = seL4_GetMR(i);
             if (mr != seed) {
@@ -164,10 +170,12 @@ replywait_func(seL4_Word endpoint, seL4_Word seed, seL4_CPtr reply, seL4_Word ex
     int first = 1;
     seL4_MessageInfo_t tag = seL4_MessageInfo_new(0, 0, 0, 0);
 
+    //ZF_LOGE("s20\n");
     test_result_t result = SUCCESS;
     FOR_EACH_LENGTH(length) {
         seL4_Word sender_badge = 0;
 
+        //ZF_LOGE("s21\n");
         /* First reply/wait can't reply. */
         if (first) {
 #ifdef CONFIG_KERNEL_RT
@@ -180,6 +188,7 @@ replywait_func(seL4_Word endpoint, seL4_Word seed, seL4_CPtr reply, seL4_Word ex
             tag = api_reply_recv(endpoint, tag, &sender_badge, reply);
         }
 
+        //ZF_LOGE("s22\n");
         seL4_Word actual_len = length;
         /* Sanity check the received message. */
         if (actual_len <= seL4_MsgMaxLength) {
@@ -190,6 +199,7 @@ replywait_func(seL4_Word endpoint, seL4_Word seed, seL4_CPtr reply, seL4_Word ex
             actual_len = seL4_MsgMaxLength;
         }
 
+        //ZF_LOGE("s23\n");
         for (int i = 0; i < actual_len; i++) {
             seL4_Word mr = seL4_GetMR(i);
             if (mr != seed) {
@@ -202,11 +212,14 @@ replywait_func(seL4_Word endpoint, seL4_Word seed, seL4_CPtr reply, seL4_Word ex
             seed++;
         }
 
+        //ZF_LOGE("s24\n");
         /* Construct a reply. */
         for (int i = 0; i < actual_len; i++) {
             seL4_SetMR(i, seed);
             seed++;
         }
+
+        //ZF_LOGE("s25\n");
     }
 
     /* Need to do one last reply to match call. */
@@ -293,6 +306,10 @@ test_ipc_pair(env_t env, test_func_t fa, test_func_t fb, bool inter_as, seL4_Wor
     vka_t *vka = &env->vka;
 
     UNUSED int error;
+
+    ZF_LOGE("inter_as: %d\n", inter_as);
+    ZF_LOGE("nr_cores: %d\n", nr_cores);
+
     seL4_CPtr ep = vka_alloc_endpoint_leaky(vka);
     seL4_Word start_number = 0xabbacafe;
 
@@ -306,7 +323,7 @@ test_ipc_pair(env_t env, test_func_t fa, test_func_t fb, bool inter_as, seL4_Wor
             for (int sender_prio = 98; sender_prio <= 102; sender_prio++) {
                 for (int waiter_prio = 100; waiter_prio <= 100; waiter_prio++) {
                     for (int sender_first = 0; sender_first <= 1; sender_first++) {
-                        ZF_LOGD("%d %s %d\n",
+                        ZF_LOGE("%d %s %d\n",
                                 sender_prio, sender_first ? "->" : "<-", waiter_prio);
                         seL4_Word thread_a_arg0, thread_b_arg0;
                         seL4_CPtr thread_a_reply, thread_b_reply;
@@ -328,7 +345,9 @@ test_ipc_pair(env_t env, test_func_t fa, test_func_t fb, bool inter_as, seL4_Wor
                                 thread_b_reply = sel4utils_copy_cap_to_process(&thread_b.process, vka, b_reply);
                             }
                         } else {
+                            ZF_LOGE("s00\n");
                             create_helper_thread(env, &thread_a);
+                            ZF_LOGE("s01\n");
                             create_helper_thread(env, &thread_b);
                             thread_a_arg0 = ep;
                             thread_b_arg0 = ep;
@@ -336,10 +355,14 @@ test_ipc_pair(env_t env, test_func_t fa, test_func_t fb, bool inter_as, seL4_Wor
                             thread_b_reply = b_reply;
                         }
 
+                        ZF_LOGE("s02\n");
                         set_helper_priority(env, &thread_a, sender_prio);
+                        ZF_LOGE("s03\n");
                         set_helper_priority(env, &thread_b, waiter_prio);
 
+                        ZF_LOGE("s04\n");
                         set_helper_affinity(env, &thread_a, core_a);
+                        ZF_LOGE("s05\n");
                         set_helper_affinity(env, &thread_b, core_b);
 
                         /* Set the flag for nbwait_func that tells it whether or not it really
@@ -351,25 +374,34 @@ test_ipc_pair(env_t env, test_func_t fa, test_func_t fb, bool inter_as, seL4_Wor
                         /* Threads are enqueued at the head of the scheduling queue, so the
                          * thread enqueued last will be run first, for a given priority. */
                         if (sender_first) {
+                            ZF_LOGE("s06\n");
                             start_helper(env, &thread_b, (helper_fn_t) fb, thread_b_arg0, start_number,
                                          thread_b_reply, nbwait_should_wait);
+                            ZF_LOGE("s07\n");
                             start_helper(env, &thread_a, (helper_fn_t) fa, thread_a_arg0, start_number,
                                         thread_a_reply, nbwait_should_wait);
                         } else {
+                            ZF_LOGE("s08\n");
                             start_helper(env, &thread_a, (helper_fn_t) fa, thread_a_arg0, start_number,
                                         thread_a_reply, nbwait_should_wait);
+                            ZF_LOGE("s09\n");
                             start_helper(env, &thread_b, (helper_fn_t) fb, thread_b_arg0, start_number,
                                          thread_b_reply, nbwait_should_wait);
                         }
 
+                        ZF_LOGE("s0a\n");
                         test_result_t res = wait_for_helper(&thread_a);
                         test_eq(res, SUCCESS);
+                        ZF_LOGE("s0b\n");
                         res = wait_for_helper(&thread_b);
                         test_eq(res, SUCCESS);
 
+                        ZF_LOGE("s0c\n");
                         cleanup_helper(env, &thread_a);
+                        ZF_LOGE("s0d\n");
                         cleanup_helper(env, &thread_b);
 
+                        ZF_LOGE("s0e\n");
                         start_number += 0x71717171;
                     }
                 }
