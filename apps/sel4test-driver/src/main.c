@@ -292,6 +292,14 @@ void sel4test_stop_tests(test_result_t result, int tests_done, int tests_failed,
     printf("\n\n");
 }
 
+static bool takeTest(const char *testName)
+{
+    if (strcmp("IPC0002", testName) == 0)
+        return true;
+
+    return false;
+}
+
 static int collate_tests(testcase_t *tests_in, int n, testcase_t *tests_out[], int out_index,
                                   regex_t *reg, int* skipped_tests)
 {
@@ -299,7 +307,10 @@ static int collate_tests(testcase_t *tests_in, int n, testcase_t *tests_out[], i
         /* make sure the string is null terminated */
         tests_in[i].name[TEST_NAME_MAX - 1] = '\0';
         if (regexec(reg, tests_in[i].name, 0, NULL, 0) == 0) {
+#if 0            
             if (tests_in[i].enabled) {
+#endif                
+            if (takeTest(tests_in[i].name)) {
                 tests_out[out_index] = &tests_in[i];
                 out_index++;
             } else {
