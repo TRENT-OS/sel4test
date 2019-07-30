@@ -237,6 +237,13 @@ main(int argc, char **argv)
     test_result_t result = SUCCESS;
     if (test) {
         printf("Running test %s (%s)\n", test->name, test->description);
+
+        printf("Start wait\n");
+        for (int k = 0; k < 5000000; k++)
+        {
+        }
+        printf("Stop wait\n");
+
         result = test->function((uintptr_t)&env);
     } else {
         result = FAILURE;

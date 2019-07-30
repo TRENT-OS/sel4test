@@ -415,7 +415,6 @@ void sel4test_run_tests(struct driver_env* e)
 
 void *main_continued(void *arg UNUSED)
 {
-
     /* elf region data */
     int num_elf_regions;
     sel4utils_elf_region_t elf_regions[MAX_REGIONS];
@@ -474,8 +473,20 @@ void *main_continued(void *arg UNUSED)
 
 int main(void)
 {
+    printf("driver s000 long: Start wait\n");
+    for (int k = 0; k < 5000000 * 3; k++)
+    {
+    }
+
+    printf("driver: Stop wait\n");
     int error;
     seL4_BootInfo *info = platsupport_get_bootinfo();
+
+    printf("driver s00: Start wait\n");
+    for (int k = 0; k < 5000000; k++)
+    {
+    }
+    printf("driver: Stop wait\n");
 
 #ifdef CONFIG_DEBUG_BUILD
     seL4_DebugNameThread(seL4_CapInitThreadTCB, "sel4test-driver");
@@ -486,15 +497,33 @@ int main(void)
      * we are running on */
     simple_default_init_bootinfo(&env.simple, info);
 
+    printf("driver s01: Start wait\n");
+    for (int k = 0; k < 5000000; k++)
+    {
+    }
+    printf("driver: Stop wait\n");
+
     /* initialise the test environment - allocator, cspace manager, vspace
      * manager, timer
      */
     init_env(&env);
 
+    printf("driver s02: Start wait\n");
+    for (int k = 0; k < 5000000; k++)
+    {
+    }
+    printf("driver: Stop wait\n");
+
     /* Allocate slots for, and obtain the caps for, the hardware we will be
      * using, in the same function.
      */
     sel4platsupport_init_default_serial_caps(&env.vka, &env.vspace, &env.simple, &env.serial_objects);
+
+    printf("driver s03: Start wait\n");
+    for (int k = 0; k < 5000000; k++)
+    {
+    }
+    printf("driver: Stop wait\n");
 
     /* Construct a vka wrapper for returning the serial frame. We need to
      * create this wrapper as the actual vka implementation will only
@@ -506,6 +535,12 @@ int main(void)
      */
     vka_t serial_vka = env.vka;
     serial_vka.utspace_alloc_at = arch_get_serial_utspace_alloc_at(&env);
+
+    printf("driver s04: Start wait\n");
+    for (int k = 0; k < 5000000; k++)
+    {
+    }
+    printf("driver: Stop wait\n");
 
     /* Construct a simple wrapper for returning the I/O ports. We need this
      * wrapper as we can only allocate I/O ports once and we already allocated
@@ -522,6 +557,12 @@ int main(void)
     init_timer();
 
     simple_print(&env.simple);
+
+    printf("driver s05: Start wait\n");
+    for (int k = 0; k < 5000000; k++)
+    {
+    }
+    printf("driver: Stop wait\n");
 
     /* switch to a bigger, safer stack with a guard page
      * before starting the tests */
