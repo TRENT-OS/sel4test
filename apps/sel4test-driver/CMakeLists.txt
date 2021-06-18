@@ -21,6 +21,9 @@ config_option(
     DEFAULT
     ON
 )
+
+config_option(Sel4testHaveFPU HAVE_FPU "Enable tests that require a FPU" DEFAULT ON)
+
 if(Sel4testAllowSettingsOverride)
     mark_as_advanced(CLEAR Sel4testHaveTimer Sel4testHaveCache)
 else()
