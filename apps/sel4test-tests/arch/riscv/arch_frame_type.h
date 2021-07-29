@@ -13,9 +13,10 @@
 static const frame_type_t frame_types[] = {
     /* Rocket-Chip only has a default 256MiB of RAM in rocketchip.dts,
     * so we can't allocate a 1GiB page for this test.
-    * Polarfire has 1GiB of memory can't allocate a 1GiB page for user space */
+    * Polarfire has 1GiB of memory can't allocate a 1GiB page for user space
+    * MiG-V only has 64MiB of RAM, so we can't allocate a 1GiB page for this test. */
 #if __riscv_xlen == 64 && !defined(CONFIG_PLAT_ROCKETCHIP) \
- && !defined(CONFIG_PLAT_ARIANE) &&!defined(CONFIG_PLAT_POLARFIRE)
+ && !defined(CONFIG_PLAT_ARIANE) && !defined(CONFIG_PLAT_POLARFIRE) && !defined(CONFIG_PLAT_MIGV)
     { seL4_RISCV_Giga_Page, 0, seL4_HugePageBits, },
 #endif
     { seL4_RISCV_Mega_Page, 0, seL4_LargePageBits, },
