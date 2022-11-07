@@ -74,7 +74,8 @@ if(NOT Sel4testAllowSettingsOverride)
         if(KernelArmExportPCNTUser AND KernelArmExportPTMRUser)
             set(Sel4testHaveTimer ON CACHE BOOL "" FORCE)
         else()
-            set(Sel4testHaveTimer OFF CACHE BOOL "" FORCE)
+            #set(Sel4testHaveTimer OFF CACHE BOOL "" FORCE)
+            set(Sel4testHaveTimer ON CACHE BOOL "" FORCE)
         endif()
     elseif(
         KernelPlatformZynqmp
