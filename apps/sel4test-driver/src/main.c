@@ -176,6 +176,7 @@ static void init_timer(void)
     if (config_set(CONFIG_HAVE_TIMER)) {
         int error;
 
+        printf("init_timer()...\n");
         /* setup the timers and have our wrapper around simple capture the IRQ caps */
         error = ltimer_default_init(&env.ltimer, env.ops, NULL, NULL);
         ZF_LOGF_IF(error, "Failed to setup the timers");
@@ -183,6 +184,7 @@ static void init_timer(void)
         error = vka_alloc_notification(&env.vka, &env.timer_notify_test);
         ZF_LOGF_IF(error, "Failed to allocate notification object for tests");
 
+        printf("env.timer_notification.cptr = %p\n", env.timer_notification.cptr);
         error = seL4_TCB_BindNotification(simple_get_tcb(&env.simple), env.timer_notification.cptr);
         ZF_LOGF_IF(error, "Failed to bind timer notification to sel4test-driver\n");
 
@@ -543,6 +545,7 @@ static ps_irq_register_fn_t irq_register_fn_copy;
 static irq_id_t sel4test_timer_irq_register(UNUSED void *cookie, ps_irq_t irq, irq_callback_fn_t callback,
                                             void *callback_data)
 {
+    printf("sel4test_timer_irq_register\n");
     static int num_timer_irqs = 0;
 
     int error;
@@ -595,6 +598,16 @@ static void sel4test_exit(int code)
 
 int main(void)
 {
+    printf("sel4test-driver main()\n");
+    printf("!! sizeof(int)          is  %u\n", sizeof(int));
+    printf("!! sizeof(void *)       is  %u\n", sizeof(void *));
+    printf("!! sizeof(uintptr_t)    is  %u\n", sizeof(uintptr_t));
+    printf("!! sizeof(size_t)       is  %u\n", sizeof(size_t));
+    //printf("!! SEL4_PRIi64          is  '%s'\n", SEL4_PRIi64);
+    //printf("!! SEL4_PRI_word        is  '%s'\n", SEL4_PRI_word);
+    printf("!! sizeof(seL4_Word *)  is  %u\n", sizeof(seL4_Word *));
+    printf("!! UINT64_MAX           is  %"PRIu64", 0x%"PRIx64"\n", UINT64_MAX, UINT64_MAX);
+
     /* Set exit handler */
     sel4runtime_set_exit(sel4test_exit);
 
